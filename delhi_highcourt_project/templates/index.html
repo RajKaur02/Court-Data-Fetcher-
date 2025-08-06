@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delhi High Court Case Fetcher</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .container { background-color: #fff; padding: 30px 40px; border-radius: 10px;box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 800px; text-align: center;}
+        h1 {margin-bottom: 20px; font-size: 24px;}
+        label {display: block; margin: 15px 0 5px; text-align: left; }
+        input, select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px;
+        }
+        button {margin-top: 20px; width: 100%; padding: 12px; background-color: #007bff; color: white;
+            border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
+        button:hover {background-color: #0056b3; }
+        #caseDetails { margin-top: 25px; text-align: left; background: #f1f1f1; padding: 15px;
+            border-radius: 8px; font-size: 14px; }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Delhi High Court Case Detail</h1>
+        <form id="caseForm">
+            <label for="caseType">Case Type:</label>
+            <select name="case_type" id="caseType" required>
+                <option value="">--Select Case Type--</option>
+                <option value="CIVIL">CIVIL</option>
+                <option value="CRIMINAL">CRIMINAL</option>
+                <option value="W.P.(C)">W.P.(C)</option>
+                <option value="W.P.(CRL)">W.P.(CRL)</option>
+                <option value="FAO">FAO</option>
+                
+            </select>
+
+            <label for="caseNumber">Case Number:</label>
+            <input type="text" name="case_number" id="caseNumber" required>
+
+            <label for="caseYear">Case Year:</label>
+            <select name="case_year" id="caseYear" required>
+                <option value="">--Select Year--</option>
+                <!-- Dynamically generate year options using JS -->
+            </select>
+
+            <button type="submit">Fetch Case Details</button>
+        </form>
+
+        <div id="caseDetails"></div>
+        <a href="/download/csv" class="btn btn-success">Download CSV</a>
+<a href="/download/excel" class="btn btn-primary">Download Excel</a>
+
+    </div>
+
+    <script>
+    // Populate Year Dropdown (2000 to current year)
+    const caseYearSelect = document.getElementById('caseYear');
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= 2000; year--) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.text = year;
+        caseYearSelect.appendChild(option);
+    }
+
+    document.getElementById('caseForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch('/fetch', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('caseDetails').innerHTML = data.case_details_html;
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(err => console.error('Fetch Error:', err));
+    });
+    </script>
+</body>
+</html>
